@@ -14,6 +14,7 @@ MIT License - Free for everyone, built by everyone
 import re
 import json
 import csv
+import argparse  # <-- NEW: For handling command line arguments
 from datetime import datetime
 from typing import List, Dict, Optional
 import pyperclip
@@ -39,6 +40,9 @@ class ROLemaCore:
             'usa': 'USA',
             'uk': 'UKX',  # Pad to 3 letters
             'ai': 'AIX',
+            'nike': 'NIK',  # Added more examples
+            'adidas': 'ADI',
+            'google': 'GOO',
         }
         
         self.stop_words = ['the', 'and', 'of', 'for', 'in', 'on', 'at', 'by', 'a', 'an']
@@ -169,24 +173,55 @@ class ROLemaCLI:
     
     def display_help(self):
         help_text = """
-Commands:
-  convert <text>     - Convert text to RO-LE-MA
-  batch              - Batch convert multiple items
-  stats              - Show conversion statistics
-  export <filename>  - Export history to CSV
-  clear              - Clear history
-  help               - Show this help
-  exit               - Exit program
-
-Examples:
-  convert Eiffel Tower        -> EIF-TOW
-  convert Coca-Cola Can       -> COC-COL-CAN
-  convert Robot Learning Machine -> ROB-LEA-MAC
+╔════════════════════════════════════════════════════════════╗
+║                     RO-LE-MA HELP                          ║
+╠════════════════════════════════════════════════════════════╣
+║  USAGE:                                                     ║
+║    python ro_le_ma.py [COMMAND] [TEXT]                     ║
+║                                                             ║
+║  COMMANDS:                                                  ║
+║    convert <text>     Convert text to RO-LE-MA code        ║
+║    batch              Start batch conversion mode          ║
+║    stats              Show conversion statistics           ║
+║    export <filename>  Export history to CSV                ║
+║    --help, -h         Show this help message               ║
+║    --version, -v      Show version information             ║
+║    --test             Run quick test examples              ║
+║                                                             ║
+║  EXAMPLES:                                                  ║
+║    python ro_le_ma.py convert "Eiffel Tower"               ║
+║    > EIF-TOW                                                ║
+║                                                             ║
+║    python ro_le_ma.py convert "Coca-Cola Can"              ║
+║    > COC-COL-CAN                                            ║
+║                                                             ║
+║    python ro_le_ma.py --test                                ║
+║    (runs 8 test conversions)                                ║
+║                                                             ║
+║    python ro_le_ma.py batch                                 ║
+║    (enters interactive batch mode)                          ║
+║                                                             ║
+║  TIPS:                                                      ║
+║    • Codes are copied to clipboard automatically           ║
+║    • Add special cases in the code's special_cases dict    ║
+║    • Use hyphens for multi-word items: "Star-Wars"         ║
+║                                                             ║
+║  LEARN MORE:                                                ║
+║    GitHub: https://github.com/ismailwiess4-creator/ro-le-ma║
+║    License: MIT - Free for everyone!                        ║
+║                                                             ║
+╚════════════════════════════════════════════════════════════╝
         """
         print(help_text)
     
-    def run(self):
-        """Main CLI loop"""
+    def display_version(self):
+        """Show version info"""
+        print(f"RO-LE-MA version {__version__}")
+        print(f"License: {__license__}")
+        print("The Universal Code for Everything")
+    
+    def run_interactive(self):
+        """Run in interactive mode"""
         self.display_banner()
         print("Type 'help' for commands, 'exit' to quit\n")
         
@@ -201,8 +236,11 @@ Examples:
                     print("👋 See you, bro! Keep coding!")
                     break
                 
-                elif cmd == 'help':
+                elif cmd in ['help', '--help', '-h']:
                     self.display_help()
+                
+                elif cmd in ['version', '--version', '-v']:
+                    self.display_version()
                 
                 elif cmd == 'stats':
                     stats = self.core.get_stats()
@@ -292,27 +330,66 @@ def quick_test():
 
 
 def main():
-    """Main entry point"""
-    if len(sys.argv) > 1:
-        # Command line mode
+    """Main entry point with argument parsing"""
+    parser = argparse.ArgumentParser(
+        description="RO-LE-MA: Convert anything into readable 3-letter codes",
+        add_help=False  # We'll handle help ourselves for custom formatting
+    )
+    
+    parser.add_argument('command', nargs='?', help='Command to execute')
+    parser.add_argument('text', nargs='*', help='Text to convert')
+    parser.add_argument('--help', '-h', action='store_true', help='Show this help message')
+    parser.add_argument('--version', '-v', action='store_true', help='Show version information')
+    parser.add_argument('--test', action='store_true', help='Run test examples')
+    
+    args = parser.parse_args()
+    
+    # Create CLI instance for displaying help
+    cli = ROLemaCLI()
+    
+    # Handle help flag
+    if args.help:
+        cli.display_help()
+        return
+    
+    # Handle version flag
+    if args.version:
+        cli.display_version()
+        return
+    
+    # Handle test flag
+    if args.test:
+        quick_test()
+        return
+    
+    # Handle commands
+    if args.command:
         core = ROLemaCore()
-        text = ' '.join(sys.argv[1:])
-        result = core.convert(text)
-        if 'error' in result:
-            print(f"Error: {result['error']}")
+        
+        if args.command == 'convert' and args.text:
+            text = ' '.join(args.text)
+            result = core.convert(text)
+            if 'error' in result:
+                print(f"Error: {result['error']}")
+            else:
+                print(result['code'])
+                # Try to copy to clipboard
+                try:
+                    pyperclip.copy(result['code'])
+                except:
+                    pass
+        elif args.command == 'stats':
+            stats = core.get_stats()
+            for k, v in stats.items():
+                print(f"{k.replace('_', ' ').title()}: {v}")
         else:
-            print(result['code'])
+            print(f"Unknown command: {args.command}")
+            print("Try: python ro_le_ma.py --help")
     else:
-        # Interactive mode
+        # No arguments = interactive mode
         cli = ROLemaCLI()
-        cli.run()
+        cli.run_interactive()
 
 
 if __name__ == "__main__":
-    # Show test on startup
-    quick_test()
-    
-    # Ask to continue
-    response = input("\n🚀 Start interactive mode? (y/n): ").strip().lower()
-    if response == 'y':
-        main()
+    main()
