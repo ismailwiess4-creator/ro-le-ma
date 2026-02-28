@@ -15,8 +15,6 @@ Robot Learning Machine -> ROB-LEA-MAC
 | Ugly and breaks design | Can be BEAUTIFUL typography |
 | One company controls standards | OPEN SOURCE, built by YOU |
 
-## 🚀 Quick Start
-
 ```bash
 # Install
 pip install pyperclip
@@ -26,4 +24,6 @@ python ro_le_ma.py
 
 # Or use as a one-liner
 python ro_le_ma.py "Eiffel Tower"
+# Output: EIF-TOW
+```
 # Output: EIF-TOW
