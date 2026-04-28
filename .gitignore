@@ -1,0 +1,45 @@
+
+---
+### 🛠️ Step 3: Professional Packaging (pyproject.toml)
+
+Create `pyproject.toml` for modern Python packaging:
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ro-le-ma"
+version = "0.1.0"
+description = "A consciousness-inspired knowledge architecture: Routes • Levels • Maps"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+  {name = "Ismail Wiess", email = "ismail.wiess@gmail.com"}
+]
+keywords = ["ai", "consciousness", "knowledge-graph", "wisdom", "ethics"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "torch>=2.0",
+  "networkx>=3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "black>=23.0", "mypy>=1.0"]
+docs = ["sphinx>=6.0", "sphinx-rtd-theme>=1.2"]
+
+[project.urls]
+"Homepage" = "https://github.com/ismailwiess4-creator/ro-le-ma"
+"Bug Tracker" = "https://github.com/ismailwiess4-creator/ro-le-ma/issues"
